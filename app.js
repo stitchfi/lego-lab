@@ -410,14 +410,23 @@ function renderHome() {
 }
 
 // ===== 購物清單 =====
-function searchLinks(q) {
-  if (!q) return "";
-  const k = encodeURIComponent(q);
-  return `<div class="links">
-    <a href="https://www.momoshop.com.tw/search/searchShop.jsp?keyword=${k}" target="_blank" rel="noopener">momo 搜尋</a>
-    <a href="https://24h.pchome.com.tw/search/?q=${k}" target="_blank" rel="noopener">PChome 搜尋</a>
-    <a href="https://shopee.tw/search?keyword=${k}" target="_blank" rel="noopener">蝦皮搜尋</a>
-  </div>`;
+// 商品有寫 stores 時，只顯示查過確定有賣的通路；沒寫就三個都顯示
+const STORE_LINKS = {
+  lego: (it) => (it.url ? [it.url, "樂高台灣官網"] : null),
+  momo: (it, k) => [`https://www.momoshop.com.tw/search/searchShop.jsp?keyword=${k}`, "momo 搜尋"],
+  pchome: (it, k) => [`https://24h.pchome.com.tw/search/?q=${k}`, "PChome 搜尋"],
+  shopee: (it, k) => [`https://shopee.tw/search?keyword=${k}`, "蝦皮搜尋"],
+};
+
+function searchLinks(it) {
+  if (!it.search && !it.url) return "";
+  const k = encodeURIComponent(it.search || "");
+  const links = (it.stores || ["momo", "pchome", "shopee"])
+    .map((s) => (it.search || s === "lego" ? STORE_LINKS[s](it, k) : null))
+    .filter(Boolean);
+  return `<div class="links">${links
+    .map(([href, text]) => `<a href="${esc(href)}" target="_blank" rel="noopener">${text}</a>`)
+    .join("")}</div>`;
 }
 
 function renderShop() {
@@ -431,7 +440,7 @@ function renderShop() {
       <p>每個樂高商品都有一組官方編號，叫做<b>型號</b>，印在盒子上，就像每支手機都有自己的型號。
         例如 <span class="code">42218</span> 就是 Technic 的 John Deere 收割機。</p>
       <ul>
-        <li><b>搜尋最準：</b>打「LEGO 42218」比打「樂高 收割機」更容易找到對的商品。下面的 momo、PChome、蝦皮按鈕就是用型號幫你搜尋。</li>
+        <li><b>搜尋最準：</b>打「LEGO 42218」比打「樂高 收割機」更容易找到對的商品。每個商品下面的按鈕，就是用型號幫你到查過有賣的網站搜尋。</li>
         <li><b>不會買錯：</b>樂高有好幾代馬達系統，長得很像但<b>彼此接不起來</b>，對好型號就不會買錯。</li>
         <li><b>分辨真假：</b>正版的盒子上一定有這組數字和 LEGO 商標。</li>
       </ul>
@@ -457,7 +466,7 @@ function renderShop() {
                    <h3>${esc(it.name)}${it.code ? `<span class="code">${esc(it.code)}</span>` : ""}</h3>
                    <p>${esc(it.why)}</p>
                    <p class="where">📍 哪裡買：${esc(it.where)}</p>
-                   ${searchLinks(it.search)}
+                   ${searchLinks(it)}
                  </div>`
                  )
                  .join("")}`

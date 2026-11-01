@@ -18,11 +18,11 @@ const IMAGES = {
   },
   "stage2": {
     "src": "images/stage2.jpg",
-    "alt": "用樂高馬達帶動的機構",
-    "artist": "Brian Alano",
+    "alt": "樂高城市系列火車",
+    "artist": "Josh Hallett from Winter Haven, FL, USA",
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-    "page": "https://commons.wikimedia.org/wiki/File:Lego_Elevator_Motor_Closeup_(8614384713).jpg"
+    "page": "https://commons.wikimedia.org/wiki/File:LEGO_7897_City_Passenger_Train_-_2006.jpg"
   },
   "stage3": {
     "src": "images/stage3.jpg",
@@ -97,52 +97,52 @@ const IMAGES = {
     "page": "https://commons.wikimedia.org/wiki/File:Volvo_car_made_out_of_LEGO.jpg"
   },
   "l9": {
-    "src": "images/stage2.jpg",
-    "alt": "樂高馬達和齒輪",
-    "artist": "Brian Alano",
+    "src": "images/l9.jpg",
+    "alt": "組好的樂高火車",
+    "artist": "Josh Hallett from Winter Haven, FL, USA",
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-    "page": "https://commons.wikimedia.org/wiki/File:Lego_Elevator_Motor_Closeup_(8614384713).jpg"
+    "page": "https://commons.wikimedia.org/wiki/File:LEGO_7897_City_Passenger_Train_-_2006_-_(1).jpg"
   },
   "l10": {
-    "src": "images/l10.jpeg",
-    "alt": "用馬達驅動的樂高車",
-    "artist": "eran goldenberg",
-    "license": "CC BY-SA 3.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-    "page": "https://commons.wikimedia.org/wiki/File:Lego_car_powered_by_ev3.jpeg"
+    "src": "images/l10.jpg",
+    "alt": "樂高高速列車",
+    "artist": "Mich973",
+    "license": "CC BY-SA 2.5 si",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5/si/deed.en",
+    "page": "https://commons.wikimedia.org/wiki/File:Lego_speed_train.JPG"
   },
   "l11": {
     "src": "images/l11.jpg",
-    "alt": "樂高 Technic 測試車",
-    "artist": "Anssi Koskinen from Turku, Finland",
-    "license": "CC BY 2.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-    "page": "https://commons.wikimedia.org/wiki/File:Lego_Technic_8865_Test_Car_(2066401781).jpg"
+    "alt": "拉著車廂的樂高火車頭",
+    "artist": "Adrián Pérez from Helsinki, Finland",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Lego_articulated_locomotive.jpg"
   },
   "l12": {
     "src": "images/l12.jpg",
-    "alt": "Technic 車子的傳動結構",
-    "artist": "Andrew Smith",
-    "license": "CC BY-SA 2.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
-    "page": "https://commons.wikimedia.org/wiki/File:Lego_Technic_8865_Test_Car_closeup.jpg"
+    "alt": "樂高火車軌道",
+    "artist": "J R S N Barnecut",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "page": "https://commons.wikimedia.org/wiki/File:LegoTrack.jpg"
   },
   "l13": {
     "src": "images/l13.jpg",
-    "alt": "樂高 Technic 吊車",
-    "artist": "Samin Maverick Yasar",
-    "license": "Public domain",
-    "licenseUrl": "",
-    "page": "https://commons.wikimedia.org/wiki/File:Lego_Technic_Crane_Truck.jpg"
+    "alt": "有場景和機關的樂高火車佈景",
+    "artist": "Bill Ward from El Cerrito, CA, USA",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Brickvention_2017_MLTC_Layout_20_of_103_(32539539861).jpg"
   },
   "l14": {
     "src": "images/l14.jpg",
-    "alt": "樂高蓋的高樓",
-    "artist": "Albin Olsson",
-    "license": "CC BY-SA 3.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-    "page": "https://commons.wikimedia.org/wiki/File:Gothia_Towers_in_Lego_01.jpg"
+    "alt": "樂高迷自己設計的火車路線",
+    "artist": "Michael Barera",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Trainfest_2022_106_(Pewaukee_Road_Lego_Train_Line).jpg"
   },
   "l15": {
     "src": "images/l15.jpg",
