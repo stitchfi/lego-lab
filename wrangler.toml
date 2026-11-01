@@ -5,5 +5,5 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "lego-lab"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "607a9bce-ee69-4b66-9a2d-51631e183885"
 migrations_dir = "migrations"

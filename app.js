@@ -7,7 +7,7 @@ const DEVICE_KEY = "lego-lab-device";
 const ADMIN = "__admin__";
 const AVATARS = ["🦁", "🐼", "🦊", "🐯", "🐸", "🐰", "🐻", "🦄", "🐧", "🐶"];
 // 正式網址；從舊的 GitHub Pages 網址打開時會自動轉過去
-const SITE_URL = "";
+const SITE_URL = "https://lego-lab.pages.dev";
 
 function readJSON(key, fallback) {
   try {
@@ -493,19 +493,7 @@ function renderLessons() {
             .join("")}
         </div>
       </section>`;
-    }).join("")}
-    <section class="stage">
-      <div class="stage-head c-blue">
-        <span class="name">🎁 加碼學習單（不計分，可以列印）</span>
-      </div>
-      <div class="grid" style="margin-top:14px">
-        <a class="card lesson-card" href="beyblade.html">
-          <span class="emoji">🌀</span>
-          <span><b>換一個零件，陀螺會變怎樣？</b><br><span class="meta">⏱ 40 分鐘・戰鬥陀螺</span></span>
-          <span class="badge">🖨 學習單</span>
-        </a>
-      </div>
-    </section>`;
+    }).join("")}`;
 }
 
 // ===== 單堂課 =====
