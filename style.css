@@ -150,7 +150,7 @@ h3 { font-size: 21px; margin: 0 0 8px; }
 
 /* 購物清單 */
 .item { margin-bottom: 14px; }
-.item .code {
+.code {
   display: inline-block;
   background: var(--blue-soft);
   color: var(--blue);
@@ -423,3 +423,6 @@ footer { text-align: center; color: var(--muted); font-size: 15px; padding: 24px
   .nav a { padding: 2px 8px; font-size: 16px; }
   .lesson-top .emoji { font-size: 48px; }
 }
+
+.code-help p, .code-help ul { margin: 6px 0; }
+.code-help .code { margin-left: 0; }

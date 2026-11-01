@@ -426,6 +426,16 @@ function renderShop() {
     <h1>🛒 分階段購物清單</h1>
     <p class="lead">先買第一階段就好！完成實驗課拿到分數，下一階段的清單才會解鎖。
       清單只列型號不列價格，請用型號在各通路比價，並認明正版 LEGO。</p>
+    <details class="card fold code-help">
+      <summary>🔢 藍色的數字（型號）是什麼？</summary>
+      <p>每個樂高商品都有一組官方編號，叫做<b>型號</b>，印在盒子上，就像每支手機都有自己的型號。
+        例如 <span class="code">42218</span> 就是 Technic 的 John Deere 收割機。</p>
+      <ul>
+        <li><b>搜尋最準：</b>打「LEGO 42218」比打「樂高 收割機」更容易找到對的商品。下面的 momo、PChome、蝦皮按鈕就是用型號幫你搜尋。</li>
+        <li><b>不會買錯：</b>樂高有好幾代馬達系統，長得很像但<b>彼此接不起來</b>，對好型號就不會買錯。</li>
+        <li><b>分辨真假：</b>正版的盒子上一定有這組數字和 LEGO 商標。</li>
+      </ul>
+    </details>
     ${SHOP.map((block) => {
       const st = stageById(block.stage);
       const open = stageUnlocked(st);
