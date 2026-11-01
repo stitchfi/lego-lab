@@ -17,6 +17,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -316,6 +317,101 @@ h3 { font-size: 21px; margin: 0 0 8px; }
   cursor: pointer;
 }
 .btn.danger { border-color: var(--red); color: var(--red); }
+
+/* 圖片 */
+.photo { margin: 16px 0; }
+.photo img {
+  display: block;
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  border-radius: 18px;
+  border: 3px solid var(--line);
+  background: #f1e6cc;
+}
+.photo.wide img { max-height: 260px; }
+.photo figcaption { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+.thumb {
+  display: block;
+  width: calc(100% + 40px);
+  margin: -18px -20px 12px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 15px 15px 0 0;
+}
+.credits li { font-size: 15px; }
+
+/* 帳號 */
+.logout {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  padding: 2px 12px;
+  cursor: pointer;
+}
+.score-pill.admin { background: var(--ink); color: #fff; }
+.kids { margin: 8px 0 20px; }
+.kid-btn {
+  font: inherit;
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+  text-align: center;
+}
+.kid-btn .emoji { display: block; font-size: 52px; line-height: 1.2; }
+.kid-btn small { display: block; font-size: 15px; color: var(--muted); font-weight: 700; }
+.kid-btn.picked { border-color: var(--blue); background: var(--blue-soft); }
+.login-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.login-form label, .login-form .label { display: flex; flex-direction: column; font-weight: 700; gap: 4px; }
+.login-form input[type="password"], .login-form input:not([type]), .modal input {
+  font: inherit;
+  padding: 10px 14px;
+  border: 3px solid var(--line);
+  border-radius: 12px;
+  width: 100%;
+}
+.avatars { display: flex; flex-wrap: wrap; gap: 8px; }
+.avatars label { flex-direction: row; cursor: pointer; }
+.avatars input { position: absolute; opacity: 0; }
+.avatars span { font-size: 34px; padding: 2px 8px; border: 3px solid var(--line); border-radius: 12px; }
+.avatars input:checked + span { border-color: var(--blue); background: var(--blue-soft); }
+.avatars input:focus-visible + span { outline: 3px solid var(--blue); }
+.fold { margin-bottom: 16px; }
+.fold summary { font-weight: 900; cursor: pointer; font-size: 20px; }
+.fold[open] summary { margin-bottom: 12px; }
+.err { color: var(--red); font-weight: 700; margin: 0; min-height: 1em; }
+.btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+.btn.small { font-size: 14px; padding: 2px 10px; margin: 2px; }
+.kids-table { width: 100%; border-collapse: collapse; font-size: 17px; }
+.kids-table th, .kids-table td { text-align: left; padding: 8px 6px; border-bottom: 1px dashed var(--line); }
+.kids-table th, .kids-table td:not(:last-child) { white-space: nowrap; }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 60;
+}
+.modal-box {
+  background: #fff;
+  border: 4px solid var(--yellow);
+  border-radius: 24px;
+  padding: 22px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+.modal-box .emoji { font-size: 52px; display: block; }
+.modal-box b { font-size: 24px; display: block; }
+.modal-box .row { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
 
 footer { text-align: center; color: var(--muted); font-size: 15px; padding: 24px 16px 40px; }
 

@@ -5,6 +5,7 @@ const STAGE_BONUS = 20;
 const STAGES = [
   {
     id: 1,
+    image: "stage1",
     name: "第一階段：積木小工程師",
     short: "積木小工程師",
     color: "red",
@@ -14,6 +15,7 @@ const STAGES = [
   },
   {
     id: 2,
+    image: "stage2",
     name: "第二階段：讓樂高動起來",
     short: "讓樂高動起來",
     color: "yellow",
@@ -23,6 +25,7 @@ const STAGES = [
   },
   {
     id: 3,
+    image: "stage3",
     name: "第三階段：小小機器人工程師",
     short: "機器人工程師",
     color: "blue",
@@ -126,7 +129,7 @@ const SHOP = [
 const LESSONS = [
   // ===== 第一階段 =====
   {
-    id: 1, stage: 1, emoji: "🗼", title: "什麼東西最穩？",
+    id: 1, stage: 1, image: "l1", emoji: "🗼", title: "什麼東西最穩？",
     question: "怎樣疊，塔才不會倒？",
     time: "30 分鐘",
     materials: ["Classic 積木（約 60 塊，同樣大小的最好）", "一張桌子", "實驗小本子和筆"],
@@ -142,7 +145,7 @@ const LESSONS = [
     discovery: "交錯疊會把積木「綁」在一起；底部越寬，塔就越不容易倒。真正的高樓也是這樣蓋的！",
   },
   {
-    id: 2, stage: 1, emoji: "🌉", title: "積木橋能撐多重？",
+    id: 2, stage: 1, image: "l2", emoji: "🌉", title: "積木橋能撐多重？",
     question: "哪一種橋最強壯？",
     time: "40 分鐘",
     materials: ["Classic 積木", "兩疊一樣高的書（當橋墩）", "20 枚硬幣或小積木（當重物）", "實驗小本子"],
@@ -158,7 +161,7 @@ const LESSONS = [
     discovery: "拱形會把重量往兩邊推開，所以比平平的橋更強壯。很多古老的石橋都是拱形的。",
   },
   {
-    id: 3, stage: 1, emoji: "🚗", title: "滾得最遠的車",
+    id: 3, stage: 1, image: "l3", emoji: "🚗", title: "滾得最遠的車",
     question: "輪子大的車比較會跑，還是輪子小的？",
     time: "40 分鐘",
     materials: ["Classic 積木（含輪子零件）", "一塊木板或一本大硬殼書（當斜坡）", "幾本書（墊高斜坡）", "膠帶（標記終點）"],
@@ -174,7 +177,7 @@ const LESSONS = [
     discovery: "大輪子比較不容易被地上的小凹凸卡住。除了輪子，車子重不重、輪子轉得順不順也會影響結果。",
   },
   {
-    id: 4, stage: 1, emoji: "🚜", title: "組第一盒 Technic",
+    id: 4, stage: 1, image: "l4", emoji: "🚜", title: "組第一盒 Technic",
     question: "這些奇怪的零件是做什麼用的？",
     time: "45 分鐘",
     materials: ["Technic 42218 或 42225 套組", "零件分類盒", "一個大人幫忙翻說明書"],
@@ -190,7 +193,7 @@ const LESSONS = [
     discovery: "Technic 用軸和齒輪把「轉動」傳到別的地方。這台作品先留著，第二階段要幫它裝馬達！",
   },
   {
-    id: 5, stage: 1, emoji: "⚙️", title: "齒輪轉轉樂",
+    id: 5, stage: 1, image: "l5", emoji: "⚙️", title: "齒輪轉轉樂",
     question: "兩個齒輪咬在一起，會往同一邊轉嗎？",
     time: "30 分鐘",
     materials: ["Technic 齒輪 3 個（可以從套組借，或用多出來的）", "Technic 長條或底板", "軸 3 根", "小積木（當記號）"],
@@ -206,7 +209,7 @@ const LESSONS = [
     discovery: "咬在一起的齒輪會反方向轉。隔一個的齒輪，又會轉回同一個方向。",
   },
   {
-    id: 6, stage: 1, emoji: "🐢", title: "快還是有力？（齒輪比）",
+    id: 6, stage: 1, image: "l6", emoji: "🐢", title: "快還是有力？（齒輪比）",
     question: "小齒輪帶大齒輪，會變快還是變慢？",
     time: "40 分鐘",
     materials: ["Technic 大齒輪 1 個、小齒輪 1 個", "Technic 長條", "軸 2 根", "小積木（當記號）", "實驗小本子"],
@@ -222,7 +225,7 @@ const LESSONS = [
     discovery: "小帶大：變慢、但很有力。大帶小：變快、但比較沒力。這是裝馬達前最重要的祕密！",
   },
   {
-    id: 7, stage: 1, emoji: "🐛", title: "蝸桿的魔法",
+    id: 7, stage: 1, image: "l7", emoji: "🐛", title: "蝸桿的魔法",
     question: "為什麼收割機的手臂放開了也不會掉下來？",
     time: "30 分鐘",
     materials: ["第 4 課組好的 42218 收割機（或任何有蝸桿的作品）"],
@@ -238,7 +241,7 @@ const LESSONS = [
     discovery: "蝸桿可以讓齒輪變得很慢、很有力，而且不會倒轉，所以適合用在吊車和升降機上。",
   },
   {
-    id: 8, stage: 1, emoji: "🏆", title: "我的發明（成果發表）",
+    id: 8, stage: 1, image: "l8", emoji: "🏆", title: "我的發明（成果發表）",
     question: "用學過的祕密零件，你能做出什麼？",
     time: "60 分鐘",
     materials: ["所有積木和 Technic 零件", "手機（拍照或錄影）"],
@@ -256,7 +259,7 @@ const LESSONS = [
 
   // ===== 第二階段 =====
   {
-    id: 9, stage: 2, emoji: "🔋", title: "讓馬達轉起來",
+    id: 9, stage: 2, image: "l9", emoji: "🔋", title: "讓馬達轉起來",
     question: "按下遙控器，馬達會怎麼轉？",
     time: "30 分鐘",
     materials: ["Powered Up 主機 88009", "遙控器 88010", "Technic L 馬達 88013", "AAA 電池（數量看包裝說明，由大人安裝）"],
@@ -272,7 +275,7 @@ const LESSONS = [
     discovery: "馬達的轉動方向是可以控制的。安全守則：手指和頭髮不要靠近正在轉的零件！",
   },
   {
-    id: 10, stage: 2, emoji: "🏎️", title: "第一台馬達車",
+    id: 10, stage: 2, image: "l10", emoji: "🏎️", title: "第一台馬達車",
     question: "怎麼讓馬達推動車子？",
     time: "45 分鐘",
     materials: ["主機、遙控器、L 馬達", "Technic 長條和軸", "4 個輪子", "插銷"],
@@ -288,7 +291,7 @@ const LESSONS = [
     discovery: "馬達轉動輪軸，輪子就會帶著車子走。車子太重或零件鬆掉，都會讓它跑不動。",
   },
   {
-    id: 11, stage: 2, emoji: "⚖️", title: "快車還是大力士？",
+    id: 11, stage: 2, image: "l11", emoji: "⚖️", title: "快車還是大力士？",
     question: "改變齒輪，車子會變快還是變有力？",
     time: "45 分鐘",
     materials: ["第 10 課的馬達車", "大齒輪和小齒輪各 1 個", "一條繩子", "一個小盒子（裝積木當貨物）", "膠帶和計時器（手機就可以）"],
@@ -304,7 +307,7 @@ const LESSONS = [
     discovery: "第 6 課的祕密用在真的車上了！賽車要快、拖車要有力，工程師會依照用途選齒輪。",
   },
   {
-    id: 12, stage: 2, emoji: "⛰️", title: "爬坡挑戰",
+    id: 12, stage: 2, image: "l12", emoji: "⛰️", title: "爬坡挑戰",
     question: "車子最陡可以爬到多高的坡？",
     time: "40 分鐘",
     materials: ["第 11 課的馬達車（兩種齒輪都試）", "一塊木板", "很多本書（墊高用）", "實驗小本子"],
@@ -320,7 +323,7 @@ const LESSONS = [
     discovery: "爬坡需要力氣，也需要抓地力。重心放對位置，輪子才不會打滑或翻車。",
   },
   {
-    id: 13, stage: 2, emoji: "🏗️", title: "電動升降機",
+    id: 13, stage: 2, image: "l13", emoji: "🏗️", title: "電動升降機",
     question: "可以用馬達把東西抬起來嗎？",
     time: "50 分鐘",
     materials: ["主機、遙控器、L 馬達", "蝸桿和齒輪（第 7 課學過的）", "Technic 長條", "一條細繩", "一個小杯子或小籃子"],
@@ -336,7 +339,7 @@ const LESSONS = [
     discovery: "蝸桿讓馬達變得超有力，而且會「鎖住」不倒轉。真正的電梯和吊車也有類似的設計。",
   },
   {
-    id: 14, stage: 2, emoji: "🌋", title: "搖搖地震台",
+    id: 14, stage: 2, image: "l14", emoji: "🌋", title: "搖搖地震台",
     question: "哪一種積木房子最耐震？",
     time: "60 分鐘",
     materials: ["主機、遙控器、L 馬達", "Technic 長條和軸", "一塊平板（底板或硬紙板）", "Classic 積木（蓋房子）"],
@@ -354,7 +357,7 @@ const LESSONS = [
 
   // ===== 第三階段 =====
   {
-    id: 15, stage: 3, emoji: "📱", title: "認識 SPIKE",
+    id: 15, stage: 3, image: "l15", emoji: "📱", title: "認識 SPIKE",
     question: "怎麼用程式命令馬達？",
     time: "40 分鐘",
     materials: ["SPIKE Essential 45345", "平板或手機（已安裝 SPIKE App）"],
@@ -370,7 +373,7 @@ const LESSONS = [
     discovery: "程式就是「一步一步的命令」。機器會完全照你排的順序做事。",
   },
   {
-    id: 16, stage: 3, emoji: "😊", title: "心情燈",
+    id: 16, stage: 3, image: "l16", emoji: "😊", title: "心情燈",
     question: "可以讓機器人表現出心情嗎？",
     time: "40 分鐘",
     materials: ["SPIKE 主機", "光矩陣", "平板（SPIKE App）"],
@@ -386,7 +389,7 @@ const LESSONS = [
     discovery: "「等待」很重要：沒有等待，表情會變得太快、你根本看不到！",
   },
   {
-    id: 17, stage: 3, emoji: "🚦", title: "顏色紅綠燈",
+    id: 17, stage: 3, image: "l17", emoji: "🚦", title: "顏色紅綠燈",
     question: "機器人可以看懂顏色嗎？",
     time: "45 分鐘",
     materials: ["SPIKE 主機、小馬達、顏色感測器", "紅色和綠色的積木", "平板（SPIKE App）"],
@@ -402,7 +405,7 @@ const LESSONS = [
     discovery: "感測器是機器人的「眼睛」。加上「如果……就……」，機器人就會自己做決定。",
   },
   {
-    id: 18, stage: 3, emoji: "🎠", title: "自動旋轉木馬",
+    id: 18, stage: 3, image: "l18", emoji: "🎠", title: "自動旋轉木馬",
     question: "可以讓旋轉木馬自己變換速度嗎？",
     time: "50 分鐘",
     materials: ["SPIKE 主機和小馬達", "SPIKE 套組裡的零件", "幾個樂高人偶"],
@@ -418,7 +421,7 @@ const LESSONS = [
     discovery: "「重複」可以讓機器一直工作，不用一直按播放。遊樂園的設施就是這樣控制的。",
   },
   {
-    id: 19, stage: 3, emoji: "🗂️", title: "顏色分類機",
+    id: 19, stage: 3, image: "l19", emoji: "🗂️", title: "顏色分類機",
     question: "可以讓機器人幫忙整理積木嗎？",
     time: "60 分鐘",
     materials: ["SPIKE 主機、1 顆小馬達、顏色感測器", "SPIKE 套組裡的零件", "紅色和藍色的小積木各 5 個", "兩個小盒子"],
@@ -434,7 +437,7 @@ const LESSONS = [
     discovery: "真正的工廠也用感測器和馬達幫忙分類。工程師會一直測試、修改，直到機器做對為止。",
   },
   {
-    id: 20, stage: 3, emoji: "🎓", title: "我的機器人發明",
+    id: 20, stage: 3, image: "l20", emoji: "🎓", title: "我的機器人發明",
     question: "你想發明一個會自己做事的機器人嗎？",
     time: "90 分鐘（可以分兩天）",
     materials: ["所有樂高零件", "SPIKE 主機、馬達、感測器、光矩陣（主機一次最多接 2 個）", "平板（SPIKE App）", "手機（拍影片）"],
