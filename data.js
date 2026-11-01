@@ -36,6 +36,7 @@ const STAGES = [
 ];
 
 // 購物清單：只列型號，不列價格（台灣各通路價格常變動，請用型號比價）
+// photo 是樂高官網的商品圖（直接連到官網，不放進專案）；image 是載入失敗時用的示意圖
 const SHOP = [
   {
     stage: 1,
@@ -45,6 +46,7 @@ const SHOP = [
         code: "",
         search: "LEGO Classic 創意",
         image: "hero",
+        photo: "https://www.lego.com/cdn/cs/set/assets/bltdec2ef6c0b99515a/11038_Box1_v39.png?fit=bounds&format=jpg&quality=80&width=600&height=600",
         url: "https://www.lego.com/zh-tw/themes/classic",
         urlLabel: "樂高台灣官網（Classic 系列）",
         stores: ["lego", "momo", "pchome", "shopee"],
@@ -56,6 +58,7 @@ const SHOP = [
         code: "42218",
         search: "LEGO 42218",
         image: "l4",
+        photo: "https://www.lego.com/cdn/cs/set/assets/blt1fef7e8881bb323c/42218_Box1_v39_en-gb.png?fit=bounds&format=jpg&quality=80&width=600&height=600",
         url: "https://www.lego.com/zh-tw/product/john-deere-1470h-wheeled-harvester-42218",
         stores: ["lego", "momo", "pchome", "shopee"],
         why: "有蝸桿吊臂和轉向，認識軸、齒輪、蝸桿的好教材。",
@@ -66,6 +69,7 @@ const SHOP = [
         code: "42225",
         search: "LEGO 42225",
         image: "shop_moto",
+        photo: "https://www.lego.com/cdn/cs/set/assets/blt97bb46ca9936c9cd/42225_boxprod_v39_en-gb.png?fit=bounds&format=jpg&quality=80&width=600&height=600",
         url: "https://www.lego.com/zh-tw/product/yellow-motorcycle-42225",
         stores: ["lego", "momo", "shopee"],
         why: "有鏈條帶動的引擎，可以觀察「轉一個、另一個跟著動」。",
@@ -90,6 +94,7 @@ const SHOP = [
         code: "60470",
         search: "LEGO 60470",
         image: "stage2",
+        photo: "https://www.lego.com/cdn/cs/set/assets/bltac92b1839caff982/blt166605a275483f87-60470_boxprod_v29.png?fit=bounds&format=jpg&quality=80&width=600&height=600",
         url: "https://www.lego.com/zh-tw/product/explorers-arctic-polar-express-train-60470",
         stores: ["lego", "momo", "shopee"],
         why: "內含遙控 Powered Up 火車頭（主機＋火車馬達＋遙控器）、車廂、平車和軌道。7 歲以上，1517 片。",
@@ -100,6 +105,7 @@ const SHOP = [
         code: "60508",
         search: "LEGO 60508",
         image: "l9",
+        photo: "https://www.lego.com/cdn/cs/set/assets/blt488521dcc0d4d21c/60508_boxprod_v39_en-gb.png?fit=bounds&format=jpg&quality=80&width=600&height=600",
         url: "https://www.lego.com/zh-tw/product/police-train-heist-60508",
         stores: ["lego", "momo", "shopee"],
         why: "一樣內含遙控 Powered Up 火車頭、3 節平車和橢圓形軌道。60470 買不到時可以改買這盒。",
@@ -125,6 +131,7 @@ const SHOP = [
         urlLabel: "樂高教育官網（英文，看介紹用）",
         stores: ["lego"],
         image: "stage3",
+        photo: "https://assets.education.lego.com/v3/assets/blt293eea581807678a/blt0cc16b7f84a5b72f/6271184b5d936230ca8eaf12/45345_Prod_01.png?locale=en-us&format=jpeg&width=600&quality=85&fit=bounds",
         code: "45345",
         search: "",
         why: "6–10 歲適用：小主機、2 顆小馬達、顏色感測器、光矩陣和圖示程式。",

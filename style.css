@@ -446,3 +446,5 @@ footer { text-align: center; color: var(--muted); font-size: 15px; padding: 24px
   .item-photo { flex: none; width: 100%; }
   .item-photo img { aspect-ratio: 16 / 9; }
 }
+
+.item-photo.official img { object-fit: contain; background: #fff; }

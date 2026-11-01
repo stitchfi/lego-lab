@@ -141,9 +141,16 @@ function figure(key, cls = "") {
   </figure>`;
 }
 
-// 購物清單的商品圖：用自由授權的示意圖，實際包裝請看商店頁面
-function itemPhoto(key) {
-  const img = typeof IMAGES !== "undefined" && IMAGES[key];
+// 購物清單的商品圖：有 photo 就直接顯示樂高官網的商品圖，載入失敗時改用 image 示意圖
+function itemPhoto(it) {
+  const img = typeof IMAGES !== "undefined" && IMAGES[it.image];
+  if (it.photo) {
+    const fallback = img ? ` onerror="this.onerror=null;this.src='${esc(img.src)}';this.nextElementSibling.textContent='示意圖・${esc(img.alt)}'"` : "";
+    return `<figure class="item-photo official">
+    <img src="${esc(it.photo)}" alt="${esc(it.name)}" loading="lazy" referrerpolicy="no-referrer"${fallback}>
+    <figcaption>${it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">樂高官方商品圖</a>` : "樂高官方商品圖"}</figcaption>
+  </figure>`;
+  }
   if (!img) return "";
   return `<figure class="item-photo">
     <img src="${esc(img.src)}" alt="${esc(img.alt)}" loading="lazy">
@@ -472,8 +479,8 @@ function renderShop() {
                ${block.items
                  .map(
                    (it) => `
-                 <div class="card item ${it.image ? "has-photo" : ""}">
-                   ${itemPhoto(it.image)}
+                 <div class="card item ${it.photo || it.image ? "has-photo" : ""}">
+                   ${itemPhoto(it)}
                    <div class="item-body">
                      <h3>${esc(it.name)}${it.code ? `<span class="code">${esc(it.code)}</span>` : ""}</h3>
                      <p>${esc(it.why)}</p>
