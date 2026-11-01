@@ -184,6 +184,30 @@ const IMAGES = {
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
     "page": "https://commons.wikimedia.org/wiki/File:Simple_Lego_Grabber_Claw-Gripper.jpg"
   },
+  "shop_moto": {
+    "src": "images/shop_moto.jpg",
+    "alt": "樂高 Technic 摩托車作品",
+    "artist": "David Luders",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Lego_Technic_MOC_%22Rage%22_Motorcycle_in_Silver.jpg"
+  },
+  "shop_battery": {
+    "src": "images/shop_battery.jpg",
+    "alt": "AAA 充電電池",
+    "artist": "WaxPhilosophic",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:AAA_Rechargeable_Battery.jpg"
+  },
+  "shop_box": {
+    "src": "images/shop_box.jpg",
+    "alt": "多抽屜分類收納櫃",
+    "artist": "Pascal from Heidelberg, Germany",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Plastic_multi-drawer_storage_cabinets.jpg"
+  },
   "l20": {
     "src": "images/l20.jpg",
     "alt": "樂高教育的機器人作品",

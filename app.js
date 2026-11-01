@@ -141,6 +141,16 @@ function figure(key, cls = "") {
   </figure>`;
 }
 
+// 購物清單的商品圖：用自由授權的示意圖，實際包裝請看商店頁面
+function itemPhoto(key) {
+  const img = typeof IMAGES !== "undefined" && IMAGES[key];
+  if (!img) return "";
+  return `<figure class="item-photo">
+    <img src="${esc(img.src)}" alt="${esc(img.alt)}" loading="lazy">
+    <figcaption>示意圖・${esc(img.alt)}｜<a href="${esc(img.page)}" target="_blank" rel="noopener">${esc(img.artist || "Wikimedia Commons")}</a>，${esc(img.license)}</figcaption>
+  </figure>`;
+}
+
 function thumb(key) {
   const img = typeof IMAGES !== "undefined" && IMAGES[key];
   return img ? `<img class="thumb" src="${esc(img.src)}" alt="" loading="lazy">` : "";
@@ -462,11 +472,14 @@ function renderShop() {
                ${block.items
                  .map(
                    (it) => `
-                 <div class="card item">
-                   <h3>${esc(it.name)}${it.code ? `<span class="code">${esc(it.code)}</span>` : ""}</h3>
-                   <p>${esc(it.why)}</p>
-                   <p class="where">📍 哪裡買：${esc(it.where)}</p>
-                   ${searchLinks(it)}
+                 <div class="card item ${it.image ? "has-photo" : ""}">
+                   ${itemPhoto(it.image)}
+                   <div class="item-body">
+                     <h3>${esc(it.name)}${it.code ? `<span class="code">${esc(it.code)}</span>` : ""}</h3>
+                     <p>${esc(it.why)}</p>
+                     <p class="where">📍 哪裡買：${esc(it.where)}</p>
+                     ${searchLinks(it)}
+                   </div>
                  </div>`
                  )
                  .join("")}`
@@ -551,7 +564,7 @@ function renderLesson() {
     <div class="question">❓ ${esc(l.question)} ${speakButton(l.question)}</div>
 
     <section class="section">
-      <h2><span class="n">1</span>需要的材料</h2>
+      <h2><span class="n">1</span>需要的材料 ${speakButton("需要的材料有：" + l.materials.join("。"))}</h2>
       <div class="card"><ul class="materials">${l.materials.map((m) => `<li>${esc(m)}</li>`).join("")}</ul></div>
     </section>
 
@@ -717,7 +730,7 @@ function renderParents() {
       credits.length
         ? `<h2>圖片來源</h2>
     <div class="card credits">
-      <p>網站上的照片都是示意圖，來自 Wikimedia Commons 的自由授權圖片，不一定是課程裡用到的同一款零件或套組。</p>
+      <p>網站上的照片都是示意圖，來自 Wikimedia Commons 的自由授權圖片，不一定是課程或購物清單裡的同一款零件或套組。實際商品外觀請看各商店的商品頁。</p>
       <ul>${credits
         .map(
           (c) =>

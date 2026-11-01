@@ -426,3 +426,23 @@ footer { text-align: center; color: var(--muted); font-size: 15px; padding: 24px
 
 .code-help p, .code-help ul { margin: 6px 0; }
 .code-help .code { margin-left: 0; }
+
+/* 購物清單商品圖 */
+.item.has-photo { display: flex; gap: 16px; align-items: flex-start; }
+.item-photo { flex: 0 0 180px; margin: 0; }
+.item-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: #f1e6cc;
+}
+.item-photo figcaption { font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: 4px; }
+.item-body { flex: 1; min-width: 0; }
+@media (max-width: 600px) {
+  .item.has-photo { flex-direction: column; }
+  .item-photo { flex: none; width: 100%; }
+  .item-photo img { aspect-ratio: 16 / 9; }
+}
