@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>陀螺實驗學習單｜樂高實驗室</title>
+  <meta name="description" content="換一個零件，陀螺會變怎樣？給 6–7 歲孩子的戰鬥陀螺實驗學習單，可以直接列印">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌀</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* 學習單專用：填寫格、表格、列印 */
+    .ws-name { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 8px 0 4px; font-weight: 700; }
+    .ws-name span { border-bottom: 2px solid var(--ink); min-width: 140px; display: inline-block; }
+    .parts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .part { text-align: center; }
+    .part .emoji { font-size: 40px; display: block; line-height: 1.3; }
+    .part b { font-size: 20px; display: block; }
+    .part p { margin: 4px 0 0; font-size: 16px; color: var(--muted); }
+    .name-code { font-size: 26px; font-weight: 900; text-align: center; letter-spacing: 2px; margin: 4px 0 8px; }
+    .name-code .k { padding: 0 6px; border-radius: 8px; }
+    .k1 { background: var(--red-soft); }
+    .k2 { background: var(--yellow-soft); }
+    .k3 { background: var(--blue-soft); }
+    .ws-table { width: 100%; border-collapse: collapse; font-size: 17px; background: #fff; }
+    .ws-table th, .ws-table td { border: 2px solid var(--line); padding: 10px 8px; text-align: center; }
+    .ws-table th { background: var(--yellow-soft); }
+    .ws-table td:first-child { white-space: nowrap; font-weight: 700; }
+    .ws-table td.blank { height: 48px; min-width: 56px; }
+    .scroll { overflow-x: auto; }
+    .choice { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; }
+    .choice span { border: 3px solid var(--line); border-radius: 999px; padding: 4px 16px; font-weight: 700; }
+    .fill { border-bottom: 2px solid var(--ink); display: inline-block; min-width: 120px; }
+    .draw { height: 200px; border: 3px dashed var(--line); border-radius: 14px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 8px 12px; color: var(--muted); font-size: 15px; }
+    .tally td.blank { height: 56px; }
+    .safety li { margin-bottom: 4px; }
+    .print-bar { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 4px; }
+    .ws-top { background: var(--red); color: #fff; }
+    .ws-top .wrap { padding-top: 10px; padding-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+    .ws-top a.back { color: #fff; font-weight: 700; }
+    .section { margin-top: 8px; }
+    @media print {
+      body { background: #fff; font-size: 15px; line-height: 1.5; }
+      .ws-top, .print-bar, footer, .no-print { display: none !important; }
+      main { padding: 0; }
+      .card { box-shadow: none; break-inside: avoid; padding: 10px 14px; }
+      h2 { font-size: 20px; margin: 16px 0 8px; break-after: avoid; }
+      h1 { font-size: 26px; }
+      .page-break { break-before: page; }
+      .draw { height: 150px; }
+      .section h2 .n, .ws-table th, .k, .question, .note, .result, .discovery {
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="ws-top">
+    <div class="wrap">
+      <a class="logo" href="index.html">🧱 樂高實驗室</a>
+      <a class="back" href="lessons.html">← 回實驗課</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="lesson-top">
+      <span class="emoji">🌀</span>
+      <div>
+        <h1>加碼實驗：換一個零件，陀螺會變怎樣？</h1>
+        <p class="lead" style="margin:0">戰鬥陀螺學習單・建議時間 40 分鐘・適合 6–7 歲和大人一起做</p>
+      </div>
+    </div>
+
+    <div class="ws-name">
+      <div>小小科學家：<span>&nbsp;</span></div>
+      <div>日期：<span>&nbsp;</span></div>
+    </div>
+
+    <div class="print-bar">
+      <button class="btn primary" type="button" onclick="window.print()">🖨 列印這張學習單</button>
+    </div>
+
+    <p class="question">❓ 只換掉陀螺最下面的「軸心」，它會轉得比較久，還是比較短？</p>
+
+    <!-- 1 -->
+    <div class="section">
+      <h2><span class="n">1</span>認識陀螺的 3 個零件</h2>
+      <div class="parts">
+        <div class="card part"><span class="emoji">🗡️</span><b>① 刃</b><p>最上面、最大塊<br>負責「撞」</p></div>
+        <div class="card part"><span class="emoji">⚙️</span><b>② 齒輪</b><p>在中間<br>決定「高度」</p></div>
+        <div class="card part"><span class="emoji">📍</span><b>③ 軸心</b><p>最下面的尖端<br>決定「怎麼跑」</p></div>
+      </div>
+      <p style="margin-top:14px">陀螺的名字就是零件說明書：</p>
+      <div class="card">
+        <p class="name-code"><span class="k k1">蒼龍之劍</span> <span class="k k2">3-60</span> <span class="k k3">F</span></p>
+        <p style="margin:0;text-align:center;font-size:16px">紅色＝刃的名字・黃色＝齒輪（3 個爪、高 6.0 mm）・藍色＝軸心（F 是平底）</p>
+      </div>
+      <p>✏️ 把你的陀螺名字抄下來：</p>
+      <p>陀螺 A：<span class="fill" style="min-width:220px">&nbsp;</span>　陀螺 B：<span class="fill" style="min-width:220px">&nbsp;</span></p>
+    </div>
+
+    <!-- 2 -->
+    <div class="section">
+      <h2><span class="n">2</span>準備材料</h2>
+      <div class="card">
+        <ul class="materials">
+          <li>2 顆 Beyblade X 陀螺（軸心形狀不一樣的，例如一顆尖尖、一顆平平）</li>
+          <li>1 支發射器</li>
+          <li>1 個對戰盤（Xtreme Stadium）</li>
+          <li>計時器（手機就可以）</li>
+          <li>鉛筆和這張學習單</li>
+        </ul>
+      </div>
+      <div class="note">
+        <b>🦺 安全守則</b>
+        <ul class="safety" style="margin:4px 0 0">
+          <li>發射時陀螺要朝著對戰盤，不可以對著人。</li>
+          <li>臉不要靠太近，撞擊時零件可能會彈出來。</li>
+          <li>拆裝零件時請大人在旁邊，小零件不可以放進嘴巴。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="section">
+      <h2><span class="n">3</span>先猜一猜</h2>
+      <div class="card">
+        <p style="margin-top:0">把陀螺 A 的軸心拆下來，跟陀螺 B 交換。你覺得：</p>
+        <p>👉 用<b>尖尖的軸心</b>時，陀螺會……（圈起來）</p>
+        <div class="choice"><span>轉比較久</span><span>轉比較短</span><span>差不多</span></div>
+        <p>👉 用<b>平平的軸心</b>時，陀螺會……（圈起來）</p>
+        <div class="choice"><span>在中間不太動</span><span>到處衝來衝去</span></div>
+        <p style="margin-bottom:0">我這樣猜的原因：<span class="fill" style="min-width:60%">&nbsp;</span></p>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="section page-break">
+      <h2><span class="n">4</span>實驗一：誰轉最久？</h2>
+      <div class="card">
+        <ol class="steps">
+          <li><label><span class="num">1.</span><span>只用<b>同一個刃和同一個齒輪</b>，先裝上尖尖的軸心。</span></label></li>
+          <li><label><span class="num">2.</span><span>發射到對戰盤上，大人按計時器，陀螺<b>完全停下來</b>就按停。</span></label></li>
+          <li><label><span class="num">3.</span><span>同樣的方法再做 2 次，一共 3 次，記在表格裡。</span></label></li>
+          <li><label><span class="num">4.</span><span>只把軸心換成平平的，其他都不動，再做 3 次。</span></label></li>
+          <li><label><span class="num">5.</span><span>每次都盡量用一樣的力氣發射（可以請同一個人發射）。</span></label></li>
+        </ol>
+      </div>
+      <div class="scroll" style="margin-top:14px">
+        <table class="ws-table">
+          <tr><th>軸心</th><th>第 1 次（秒）</th><th>第 2 次（秒）</th><th>第 3 次（秒）</th><th>最久的一次 ⭐</th></tr>
+          <tr><td>📍 尖尖的</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+          <tr><td>🟫 平平的</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+        </table>
+      </div>
+      <p>🔍 我還看到：尖尖的軸心在盤子上 <span class="fill">&nbsp;</span>，平平的軸心在盤子上 <span class="fill">&nbsp;</span>。</p>
+    </div>
+
+    <!-- 5 -->
+    <div class="section">
+      <h2><span class="n">5</span>實驗二：換了軸心，誰會贏？</h2>
+      <div class="card">
+        <p style="margin-top:0">陀螺 A 和陀螺 B 對戰 5 回合，每回合在贏的那一欄打 ✔。<br>
+        比完之後，<b>把兩顆的軸心交換</b>，再比 5 回合。</p>
+      </div>
+      <div class="scroll" style="margin-top:14px">
+        <table class="ws-table tally">
+          <tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>贏幾次</th></tr>
+          <tr><td>原本的 A</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+          <tr><td>原本的 B</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+          <tr><td>換軸心的 A</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+          <tr><td>換軸心的 B</td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+        </table>
+      </div>
+      <p>換了軸心之後，比較會贏的變成：<span class="fill">&nbsp;</span></p>
+    </div>
+
+    <!-- 6 -->
+    <div class="section">
+      <h2><span class="n">6</span>畫下我的最強陀螺</h2>
+      <div class="draw">用哪個刃＋哪個齒輪＋哪個軸心？畫下來，也幫它取個名字！</div>
+      <p>我的最強組合叫做：<span class="fill" style="min-width:60%">&nbsp;</span></p>
+    </div>
+
+    <!-- 7 -->
+    <div class="section">
+      <h2><span class="n">7</span>我的發現</h2>
+      <div class="card discovery">
+        <p style="margin-top:0">我猜的跟結果一樣嗎？（圈起來）</p>
+        <div class="choice"><span>一樣 😄</span><span>不一樣 🤔</span></div>
+        <p style="margin-bottom:0">我發現：只換掉 <span class="fill">&nbsp;</span>，陀螺就會 <span class="fill" style="min-width:40%">&nbsp;</span>。</p>
+      </div>
+    </div>
+
+    <!-- 給大人 -->
+    <details class="fold card no-print" style="margin-top:28px">
+      <summary>👨‍👩‍👧 給大人：引導重點和參考答案</summary>
+      <ul>
+        <li><b>這堂課的核心是「控制變因」</b>：一次只換一個零件，其他都不動，才知道差別是誰造成的。這跟第 3 課「滾得最遠的車」只換輪子是同一個道理，可以提醒孩子連結起來。</li>
+        <li><b>通常的結果</b>：尖尖的軸心和盤面接觸小、摩擦小，會停在中間轉得比較久；平平的軸心摩擦大，會沿著盤子衝來衝去、撞擊力強，但比較快停。實際結果會因陀螺型號和發射力道不同，<b>以孩子量到的為準</b>，不一樣也是很好的討論機會。</li>
+        <li><b>為什麼要做 3 次</b>：每次發射力道都不完全一樣，多做幾次才公平。可以跟孩子聊「為什麼不能只做一次就下結論？」</li>
+        <li><b>發射小技巧</b>：發射器要拿平、拉條一口氣拉到底。6–7 歲孩子力氣不夠時，可以由大人統一發射，讓孩子專心觀察和記錄。</li>
+        <li><b>零件互換</b>：只有 Beyblade X 系列的零件可以互換，舊的 Burst 系列不相容。</li>
+      </ul>
+    </details>
+  </main>
+
+  <footer>🧱 樂高實驗室・給孩子和大人一起動手做｜Beyblade® 是 Takara Tomy 的商標，本頁為個人製作的教學學習單，與 Takara Tomy 無關。</footer>
+</body>
+</html>

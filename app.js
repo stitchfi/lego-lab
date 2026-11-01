@@ -1,12 +1,13 @@
-// 有填 firebase-config.js 時，帳號和進度存在 Firebase，同一個家庭帳號的每台裝置都會同步；
-// 沒填時只存在這台裝置瀏覽器的 localStorage。
-// 大人密碼只是防止小孩自己按完成，不是真正的資安保護。
-const STORE_KEY = "lego-lab-v2";
+// 帳號和分數存在 Cloudflare（D1 資料庫），每台設定過的平板都會同步。
+// 每台裝置第一次使用時，大人輸入一次大人密碼，這台裝置就會被記住。
+// 大人密碼只在伺服器（functions/api）檢查，不放進這個公開的檔案。
+const LEGACY_STORE_KEY = "lego-lab-v2"; // 舊版只存在瀏覽器的資料，第一次連上雲端時會搬上去
 const SESSION_KEY = "lego-lab-session";
+const DEVICE_KEY = "lego-lab-device";
 const ADMIN = "__admin__";
-// 大人密碼的 SHA-256（"lego-lab:parent:" + 密碼）。要換密碼就重算這個值。
-const PARENT_HASH = "c335c91384a8c00fc4a3042efdaf2a3ac6c79f503cc2a70d6ba0ed7ac488c185";
 const AVATARS = ["🦁", "🐼", "🦊", "🐯", "🐸", "🐰", "🐻", "🦄", "🐧", "🐶"];
+// 正式網址；從舊的 GitHub Pages 網址打開時會自動轉過去
+const SITE_URL = "";
 
 function readJSON(key, fallback) {
   try {
@@ -23,96 +24,75 @@ function writeJSON(key, value) {
   } catch (e) {}
 }
 
-let db = readJSON(STORE_KEY, null);
-if (!db || typeof db.kids !== "object") db = { kids: {} };
-// 目前登入的是哪個小孩只記在這台裝置（每個小孩用自己的平板）
-let currentUser = readJSON(SESSION_KEY, null);
-
-// ===== 雲端同步（Firebase） =====
-const FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
-const CLOUD = typeof FIREBASE_CONFIG !== "undefined" && !!FIREBASE_CONFIG;
-let familyDoc = null;
-
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const s = document.createElement("script");
-    s.src = src;
-    s.onload = resolve;
-    s.onerror = () => reject(new Error("載入失敗：" + src));
-    document.head.appendChild(s);
-  });
+function forget(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (e) {}
 }
 
-// 回傳 true 表示資料已就緒；false 表示要先登入家庭帳號
-async function initStore() {
-  if (!CLOUD) return true;
-  for (const f of ["firebase-app-compat.js", "firebase-auth-compat.js", "firebase-firestore-compat.js"]) {
-    await loadScript(FIREBASE_SDK + f);
-  }
-  firebase.initializeApp(FIREBASE_CONFIG);
-  const fs = firebase.firestore();
-  try {
-    await fs.enablePersistence({ synchronizeTabs: true });
-  } catch (e) {}
-  const user = await new Promise((resolve) => {
-    const off = firebase.auth().onAuthStateChanged((u) => {
-      off();
-      resolve(u);
-    });
-  });
-  if (!user) return false;
+let db = { kids: {} };
+// 目前登入的是哪個小孩只記在這台裝置（每個小孩用自己的平板）
+let currentUser = readJSON(SESSION_KEY, null);
+let deviceToken = readJSON(DEVICE_KEY, null);
 
-  familyDoc = fs.collection("families").doc(user.uid);
-  let snap = await familyDoc.get();
-  if (!snap.exists) {
-    // 第一次連上雲端：把這台裝置原本的帳號一起搬上去
-    await familyDoc.set({ kids: db.kids });
-    snap = await familyDoc.get();
+// ===== 和 Cloudflare 溝通 =====
+class ApiError extends Error {
+  constructor(code, status) {
+    super(code);
+    this.code = code;
+    this.status = status;
   }
-  db = snap.data();
-  if (!db.kids) db.kids = {};
-  familyDoc.onSnapshot((s) => {
-    if (!s.exists) return;
-    db = s.data();
-    if (!db.kids) db.kids = {};
-    updateScorePill();
-  });
-  return true;
+}
+
+async function api(path, body) {
+  let res;
+  try {
+    res = await fetch("/api/" + path, {
+      method: body ? "POST" : "GET",
+      headers: { "content-type": "application/json", authorization: "Bearer " + (deviceToken || "") },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch (e) {
+    throw new ApiError("network", 0);
+  }
+  let data = {};
+  try {
+    data = await res.json();
+  } catch (e) {}
+  if (res.status === 401 && data.error === "device") {
+    // 這台裝置被登出了，要大人重新設定
+    forget(DEVICE_KEY);
+    forget(SESSION_KEY);
+    location.href = "login.html";
+  }
+  if (!res.ok) throw new ApiError(data.error || "server", res.status);
+  return data;
+}
+
+const kidPath = (name, action) => `kids/${encodeURIComponent(name)}/${action}`;
+
+function errText(e) {
+  return (
+    {
+      parent: "大人密碼不對。",
+      locked: "大人密碼錯太多次，請 15 分鐘後再試。",
+      "kid-password": "密碼不對，再試一次！",
+      "name-taken": "這個名字已經有人用了。",
+      network: "連不上網路，請檢查 Wi-Fi 後再試。",
+    }[e.code] || "伺服器出了點問題，請稍後再試。"
+  );
 }
 
 function syncError(e) {
-  toast("⚠️", "同步失敗", "分數暫時沒有存到雲端，請檢查網路後重新整理。（" + (e.message || e) + "）");
+  toast("⚠️", "沒有存到", errText(e));
 }
 
-// 每個小孩只更新自己那一格，兩台平板同時存檔也不會互相蓋掉
-function saveKid(name) {
-  if (familyDoc) familyDoc.update(new firebase.firestore.FieldPath("kids", name), db.kids[name]).catch(syncError);
-  else writeJSON(STORE_KEY, db);
-}
-
-function removeKid(name) {
-  delete db.kids[name];
-  if (familyDoc) familyDoc.update(new firebase.firestore.FieldPath("kids", name), firebase.firestore.FieldValue.delete()).catch(syncError);
-  else writeJSON(STORE_KEY, db);
-}
-
-function familyLogout() {
-  try {
-    localStorage.removeItem(SESSION_KEY);
-  } catch (e) {}
-  firebase.auth().signOut().then(() => (location.href = "login.html"));
+async function loadKids() {
+  db = await api("kids");
 }
 
 const isAdmin = () => currentUser === ADMIN;
 const kid = () => (isAdmin() ? null : db.kids[currentUser]);
-
-async function sha256(text) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-const checkParent = async (pw) => (await sha256("lego-lab:parent:" + pw)) === PARENT_HASH;
-const kidHash = (name, pw) => sha256(`lego-lab:kid:${name}:${pw}`);
 
 function login(user) {
   currentUser = user;
@@ -120,9 +100,7 @@ function login(user) {
 }
 
 function logout() {
-  try {
-    localStorage.removeItem(SESSION_KEY);
-  } catch (e) {}
+  forget(SESSION_KEY);
   location.href = "login.html";
 }
 
@@ -210,8 +188,9 @@ function toast(emoji, title, text) {
   t.querySelector("button").onclick = () => t.classList.remove("show");
 }
 
-// 大人密碼視窗：不用 prompt()，避免擋住頁面
-function askParent(message) {
+// 大人密碼視窗：不用 prompt()，避免擋住頁面。
+// action(密碼) 會把密碼送到伺服器檢查，成功時回傳它的結果；按取消回傳 null。
+function askParent(message, action) {
   return new Promise((resolve) => {
     const m = document.createElement("div");
     m.className = "modal";
@@ -228,19 +207,26 @@ function askParent(message) {
       </form>`;
     document.body.appendChild(m);
     const input = m.querySelector("input");
+    const err = m.querySelector(".err");
+    const submit = m.querySelector('[type="submit"]');
     input.focus();
     const close = (v) => {
       m.remove();
       resolve(v);
     };
-    m.querySelector("[data-cancel]").onclick = () => close(false);
+    m.querySelector("[data-cancel]").onclick = () => close(null);
     m.querySelector("form").onsubmit = async (e) => {
       e.preventDefault();
-      if (await checkParent(input.value)) close(true);
-      else {
-        m.querySelector(".err").textContent = "密碼不對，請再試一次。";
+      submit.disabled = true;
+      err.textContent = "確認中…";
+      try {
+        close(await action(input.value));
+      } catch (ex) {
+        err.textContent = errText(ex);
         input.value = "";
         input.focus();
+      } finally {
+        submit.disabled = false;
       }
     };
   });
@@ -336,11 +322,12 @@ function renderLogin() {
   kidForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const pw = document.getElementById("kid-pw");
-    if ((await kidHash(picked, pw.value)) === db.kids[picked].pwHash) {
+    try {
+      await api("kid-login", { name: picked, password: pw.value });
       login(picked);
       location.href = "index.html";
-    } else {
-      document.getElementById("kid-err").textContent = "密碼不對，再試一次！";
+    } catch (ex) {
+      document.getElementById("kid-err").textContent = errText(ex);
       pw.value = "";
     }
   });
@@ -352,21 +339,25 @@ function renderLogin() {
     const pw = document.getElementById("nk-pw").value;
     if (!name) return (err.textContent = "請輸入名字。");
     if (db.kids[name]) return (err.textContent = "這個名字已經有人用了。");
-    if (!(await checkParent(document.getElementById("nk-parent").value))) return (err.textContent = "大人密碼不對。");
     const avatar = app.querySelector('input[name="avatar"]:checked').value;
-    db.kids[name] = { avatar, pwHash: await kidHash(name, pw), done: [], checks: {} };
-    saveKid(name);
-    login(name);
-    location.href = "index.html";
+    err.textContent = "建立中…";
+    try {
+      const r = await api("kids", { name, avatar, password: pw, parentPassword: document.getElementById("nk-parent").value });
+      login(r.name);
+      location.href = "index.html";
+    } catch (ex) {
+      err.textContent = errText(ex);
+    }
   });
 
   document.getElementById("admin-login").addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (await checkParent(document.getElementById("ad-pw").value)) {
+    try {
+      await api("parent-check", { parentPassword: document.getElementById("ad-pw").value });
       login(ADMIN);
       location.href = "lessons.html";
-    } else {
-      document.getElementById("ad-err").textContent = "大人密碼不對。";
+    } catch (ex) {
+      document.getElementById("ad-err").textContent = errText(ex);
     }
   });
 }
@@ -502,7 +493,19 @@ function renderLessons() {
             .join("")}
         </div>
       </section>`;
-    }).join("")}`;
+    }).join("")}
+    <section class="stage">
+      <div class="stage-head c-blue">
+        <span class="name">🎁 加碼學習單（不計分，可以列印）</span>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        <a class="card lesson-card" href="beyblade.html">
+          <span class="emoji">🌀</span>
+          <span><b>換一個零件，陀螺會變怎樣？</b><br><span class="meta">⏱ 40 分鐘・戰鬥陀螺</span></span>
+          <span class="badge">🖨 學習單</span>
+        </a>
+      </div>
+    </section>`;
 }
 
 // ===== 單堂課 =====
@@ -603,22 +606,21 @@ function renderLesson() {
         b.checked = true;
         return;
       }
-      kid().checks[l.id] = boxes.map((x) => x.checked);
-      saveKid(currentUser);
+      const checks = boxes.map((x) => x.checked);
+      kid().checks[l.id] = checks;
+      api(kidPath(currentUser, "checks"), { lessonId: l.id, checks }).catch(syncError);
       refresh();
     })
   );
 
   btn.addEventListener("click", async () => {
     if (isDone(l.id) || !boxes.every((b) => b.checked)) return;
-    const ok = await askParent(`${currentUser} 完成了「第 ${l.id} 課・${l.title}」，請大人看過作品後輸入密碼。`);
-    if (!ok) return;
     const before = STAGES.filter(stageUnlocked).map((s) => s.id);
-    // 雲端資料可能在等待時更新過，所以重新取一次
-    const me = kid();
-    if (!me.done.includes(l.id)) me.done.push(l.id);
-    delete me.checks[l.id];
-    saveKid(currentUser);
+    const r = await askParent(`${currentUser} 完成了「第 ${l.id} 課・${l.title}」，請大人看過作品後輸入密碼。`, (pw) =>
+      api(kidPath(currentUser, "complete"), { lessonId: l.id, parentPassword: pw })
+    );
+    if (!r) return;
+    db.kids[currentUser] = r.kid;
     updateScorePill();
     refresh();
     const newly = STAGES.filter((s) => stageUnlocked(s) && !before.includes(s.id));
@@ -664,12 +666,9 @@ function renderParents() {
 
     <h2>資料同步</h2>
     <div class="card">
-      ${
-        familyDoc
-          ? `<p>☁️ <b>已連上雲端：</b>${esc(firebase.auth().currentUser.email || "家庭帳號")}。同一個家庭帳號登入的每台裝置，小孩帳號和分數都會同步。</p>
-             ${isAdmin() ? `<button class="btn danger" id="family-logout" type="button">這台裝置登出家庭帳號</button>` : ""}`
-          : `<p>📱 <b>只存在這台裝置：</b>還沒設定雲端同步，帳號和分數只存在這台裝置的瀏覽器裡。</p>`
-      }
+      <p>☁️ <b>這台裝置已連上雲端。</b>每台大人設定過的平板，小孩帳號和分數都會同步。</p>
+      <p>新的平板第一次打開網站時，大人輸入一次大人密碼就可以。</p>
+      ${isAdmin() ? `<button class="btn danger" id="family-logout" type="button">這台裝置登出</button>` : ""}
     </div>
 
     <h2>帳號和計分規則</h2>
@@ -727,15 +726,22 @@ function renderParents() {
   const fl = document.getElementById("family-logout");
   if (fl)
     fl.addEventListener("click", async () => {
-      if (await askParent("這台裝置登出後，要再輸入家庭帳號才能使用。確定嗎？")) familyLogout();
+      const r = await askParent("這台裝置登出後，要大人再輸入一次密碼才能使用。確定嗎？", (pw) =>
+        api("device-logout", { parentPassword: pw })
+      );
+      if (!r) return;
+      forget(DEVICE_KEY);
+      forget(SESSION_KEY);
+      location.href = "login.html";
     });
   document.querySelectorAll("[data-reset]").forEach((b) =>
     b.addEventListener("click", async () => {
       const n = b.dataset.reset;
-      if (!(await askParent(`確定要把 ${n} 的分數和完成紀錄清空嗎？這個動作不能復原。`))) return;
-      db.kids[n].done = [];
-      db.kids[n].checks = {};
-      saveKid(n);
+      const r = await askParent(`確定要把 ${n} 的分數和完成紀錄清空嗎？這個動作不能復原。`, (pw) =>
+        api(kidPath(n, "reset"), { parentPassword: pw })
+      );
+      if (!r) return;
+      db.kids[n] = r.kid;
       renderParents();
       toast("🧹", "進度已清除", `${n} 可以從第一階段重新開始。`);
     })
@@ -743,8 +749,11 @@ function renderParents() {
   document.querySelectorAll("[data-del]").forEach((b) =>
     b.addEventListener("click", async () => {
       const n = b.dataset.del;
-      if (!(await askParent(`確定要刪除 ${n} 的帳號嗎？分數也會一起刪掉，不能復原。`))) return;
-      removeKid(n);
+      const r = await askParent(`確定要刪除 ${n} 的帳號嗎？分數也會一起刪掉，不能復原。`, (pw) =>
+        api(kidPath(n, "delete"), { parentPassword: pw })
+      );
+      if (!r) return;
+      delete db.kids[n];
       renderParents();
       toast("🗑️", "帳號已刪除", `${n} 的帳號已經刪除。`);
     })
@@ -753,45 +762,51 @@ function renderParents() {
 
 const PAGES = { home: renderHome, shop: renderShop, lessons: renderLessons, lesson: renderLesson, parents: renderParents };
 
-// ===== 家庭帳號登入（每台裝置只要登入一次） =====
-function renderFamilyLogin() {
+// ===== 設定這台裝置（每台裝置只要一次） =====
+function renderDeviceSetup() {
   document.getElementById("top").innerHTML = `<div class="wrap"><span class="logo">🧱 樂高實驗室</span></div>`;
   document.getElementById("app").innerHTML = `
     <section class="hero">
       <span class="big">☁️🧱</span>
-      <h1>連上家庭帳號</h1>
-      <p class="lead">這台裝置第一次使用，請<b>大人</b>登入家庭帳號。<br>登入一次就會記住，之後小孩的分數會在每台平板同步。</p>
+      <h1>設定這台裝置</h1>
+      <p class="lead">這台裝置第一次使用，請<b>大人</b>輸入大人密碼。<br>設定一次就會記住，之後小孩的分數會在每台平板同步。</p>
     </section>
-    <form class="card login-form" id="family-login">
-      <label>家庭帳號 Email<input id="fm-email" type="email" required autocomplete="username"></label>
-      <label>家庭帳號密碼<input id="fm-pw" type="password" required autocomplete="current-password"></label>
-      <p class="err" id="fm-err" aria-live="polite"></p>
-      <button class="btn primary" type="submit">登入</button>
+    <form class="card login-form" id="device-setup">
+      <label>大人密碼<input id="ds-pw" type="password" required autocomplete="off"></label>
+      <p class="err" id="ds-err" aria-live="polite"></p>
+      <button class="btn primary" type="submit">開始使用</button>
     </form>`;
-  document.getElementById("family-login").addEventListener("submit", async (e) => {
+  document.getElementById("device-setup").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const err = document.getElementById("fm-err");
-    err.textContent = "登入中…";
+    const err = document.getElementById("ds-err");
+    err.textContent = "設定中…";
     try {
-      await firebase.auth().signInWithEmailAndPassword(document.getElementById("fm-email").value.trim(), document.getElementById("fm-pw").value);
+      const legacy = readJSON(LEGACY_STORE_KEY, null);
+      const r = await api("device", { parentPassword: document.getElementById("ds-pw").value, importKids: legacy && legacy.kids });
+      deviceToken = r.token;
+      writeJSON(DEVICE_KEY, r.token);
+      forget(LEGACY_STORE_KEY);
       location.href = "login.html";
     } catch (ex) {
-      err.textContent = "登入失敗，請確認 Email 和密碼。（" + (ex.code || ex.message) + "）";
+      err.textContent = errText(ex);
     }
   });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   const page = document.body.dataset.page;
-  let ready;
-  try {
-    ready = await initStore();
-  } catch (e) {
-    document.getElementById("app").innerHTML = `<div class="lock-box"><span class="emoji">📡</span>連不上雲端，請檢查網路後重新整理。<br><small>${esc(e.message || e)}</small></div>`;
+  if (SITE_URL && location.hostname.endsWith("github.io")) {
+    location.replace(SITE_URL + "/" + location.pathname.split("/").pop() + location.search);
     return;
   }
-  if (!ready) {
-    renderFamilyLogin();
+  if (!deviceToken) {
+    renderDeviceSetup();
+    return;
+  }
+  try {
+    await loadKids();
+  } catch (e) {
+    document.getElementById("app").innerHTML = `<div class="lock-box"><span class="emoji">📡</span>${esc(errText(e))}<br><a href="">重新整理</a></div>`;
     return;
   }
   if (currentUser !== ADMIN && !db.kids[currentUser]) currentUser = null;
@@ -806,4 +821,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   renderHeader(page === "lesson" ? "lessons" : page);
   PAGES[page]();
+});
+
+// 平板從背景切回來時，抓一次最新分數
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && deviceToken && currentUser)
+    loadKids()
+      .then(updateScorePill)
+      .catch(() => {});
 });

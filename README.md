@@ -7,16 +7,25 @@
 - **親子實驗課**：20 堂課，每堂列出需要的材料、製作流程和完成的效果；步驟全部打勾、再由大人輸入密碼確認，才會得分
 - **大人管理模式**：在登入頁輸入大人密碼，可以瀏覽全部課程（不計分），也能重設或刪除小孩帳號
 
-- **跨裝置同步**：設定 Firebase 後，每台平板登入一次家庭帳號，小孩的帳號和分數就會同步。設定步驟見 [SETUP-FIREBASE.md](SETUP-FIREBASE.md)；沒設定時資料只存在該裝置的瀏覽器
+- **跨裝置同步**：網站和資料庫都在 Cloudflare（Pages + D1）。每台平板第一次打開時，大人輸入一次大人密碼，之後小孩的帳號和分數在每台裝置同步
 
-大人密碼只用來防止小孩自己按完成，不是真正的資安保護。
+大人密碼只在 Cloudflare 伺服器檢查，雜湊值存在 Cloudflare 的祕密變數 `PARENT_HASH`，不在這個公開的 repo 裡；同一個 IP 錯 10 次會鎖 15 分鐘。
 
 ## 修改內容
 
 - 課程和購物清單：`data.js`
 - 圖片和來源：`images.js`、`images/`
-- 雲端同步設定：`firebase-config.js`、`firestore.rules`
-- 大人密碼：`app.js` 裡的 `PARENT_HASH`，是 `"lego-lab:parent:" + 密碼` 的 SHA-256
+- 後端 API：`functions/api/[[path]].js`；資料表：`migrations/`
+- 換大人密碼：重算 `"lego-lab:parent:" + 新密碼` 的 SHA-256，用 `npx wrangler pages secret put PARENT_HASH` 更新
+
+## 部署到 Cloudflare
+
+```bash
+node build.mjs
+npx wrangler pages deploy
+```
+
+第一次部署前要先 `npx wrangler login`、建立 D1 資料庫並套用 `migrations/`。本機測試：在 `.dev.vars` 放 `PARENT_HASH=...`，再執行 `npx wrangler d1 migrations apply lego-lab --local` 和 `npx wrangler pages dev`。
 
 ## 圖片來源
 
