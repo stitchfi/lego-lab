@@ -422,7 +422,7 @@ function renderHome() {
 // ===== 購物清單 =====
 // 商品有寫 stores 時，只顯示查過確定有賣的通路；沒寫就三個都顯示
 const STORE_LINKS = {
-  lego: (it) => (it.url ? [it.url, "樂高台灣官網"] : null),
+  lego: (it) => (it.url ? [it.url, it.urlLabel || "樂高台灣官網"] : null),
   momo: (it, k) => [`https://www.momoshop.com.tw/search/searchShop.jsp?keyword=${k}`, "momo 搜尋"],
   pchome: (it, k) => [`https://24h.pchome.com.tw/search/?q=${k}`, "PChome 搜尋"],
   shopee: (it, k) => [`https://shopee.tw/search?keyword=${k}`, "蝦皮搜尋"],
