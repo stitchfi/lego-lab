@@ -1,5 +1,6 @@
-// 帳號和進度都存在這台裝置瀏覽器的 localStorage，換裝置或清除瀏覽資料就會重來。
-// 這是靜態網站，密碼只是防止小孩自己按完成，不是真正的資安保護。
+// 有填 firebase-config.js 時，帳號和進度存在 Firebase，同一個家庭帳號的每台裝置都會同步；
+// 沒填時只存在這台裝置瀏覽器的 localStorage。
+// 大人密碼只是防止小孩自己按完成，不是真正的資安保護。
 const STORE_KEY = "lego-lab-v2";
 const SESSION_KEY = "lego-lab-session";
 const ADMIN = "__admin__";
@@ -24,10 +25,83 @@ function writeJSON(key, value) {
 
 let db = readJSON(STORE_KEY, null);
 if (!db || typeof db.kids !== "object") db = { kids: {} };
-const saveDb = () => writeJSON(STORE_KEY, db);
-
+// 目前登入的是哪個小孩只記在這台裝置（每個小孩用自己的平板）
 let currentUser = readJSON(SESSION_KEY, null);
-if (currentUser !== ADMIN && !db.kids[currentUser]) currentUser = null;
+
+// ===== 雲端同步（Firebase） =====
+const FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
+const CLOUD = typeof FIREBASE_CONFIG !== "undefined" && !!FIREBASE_CONFIG;
+let familyDoc = null;
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error("載入失敗：" + src));
+    document.head.appendChild(s);
+  });
+}
+
+// 回傳 true 表示資料已就緒；false 表示要先登入家庭帳號
+async function initStore() {
+  if (!CLOUD) return true;
+  for (const f of ["firebase-app-compat.js", "firebase-auth-compat.js", "firebase-firestore-compat.js"]) {
+    await loadScript(FIREBASE_SDK + f);
+  }
+  firebase.initializeApp(FIREBASE_CONFIG);
+  const fs = firebase.firestore();
+  try {
+    await fs.enablePersistence({ synchronizeTabs: true });
+  } catch (e) {}
+  const user = await new Promise((resolve) => {
+    const off = firebase.auth().onAuthStateChanged((u) => {
+      off();
+      resolve(u);
+    });
+  });
+  if (!user) return false;
+
+  familyDoc = fs.collection("families").doc(user.uid);
+  let snap = await familyDoc.get();
+  if (!snap.exists) {
+    // 第一次連上雲端：把這台裝置原本的帳號一起搬上去
+    await familyDoc.set({ kids: db.kids });
+    snap = await familyDoc.get();
+  }
+  db = snap.data();
+  if (!db.kids) db.kids = {};
+  familyDoc.onSnapshot((s) => {
+    if (!s.exists) return;
+    db = s.data();
+    if (!db.kids) db.kids = {};
+    updateScorePill();
+  });
+  return true;
+}
+
+function syncError(e) {
+  toast("⚠️", "同步失敗", "分數暫時沒有存到雲端，請檢查網路後重新整理。（" + (e.message || e) + "）");
+}
+
+// 每個小孩只更新自己那一格，兩台平板同時存檔也不會互相蓋掉
+function saveKid(name) {
+  if (familyDoc) familyDoc.update(new firebase.firestore.FieldPath("kids", name), db.kids[name]).catch(syncError);
+  else writeJSON(STORE_KEY, db);
+}
+
+function removeKid(name) {
+  delete db.kids[name];
+  if (familyDoc) familyDoc.update(new firebase.firestore.FieldPath("kids", name), firebase.firestore.FieldValue.delete()).catch(syncError);
+  else writeJSON(STORE_KEY, db);
+}
+
+function familyLogout() {
+  try {
+    localStorage.removeItem(SESSION_KEY);
+  } catch (e) {}
+  firebase.auth().signOut().then(() => (location.href = "login.html"));
+}
 
 const isAdmin = () => currentUser === ADMIN;
 const kid = () => (isAdmin() ? null : db.kids[currentUser]);
@@ -119,7 +193,7 @@ function renderHeader(active) {
 
 function updateScorePill() {
   const el = document.getElementById("score-pill");
-  if (el) el.textContent = `${kid().avatar} ${currentUser}・⭐ ${score()} 分`;
+  if (el && kid()) el.textContent = `${kid().avatar} ${currentUser}・⭐ ${score()} 分`;
 }
 
 function toast(emoji, title, text) {
@@ -281,7 +355,7 @@ function renderLogin() {
     if (!(await checkParent(document.getElementById("nk-parent").value))) return (err.textContent = "大人密碼不對。");
     const avatar = app.querySelector('input[name="avatar"]:checked').value;
     db.kids[name] = { avatar, pwHash: await kidHash(name, pw), done: [], checks: {} };
-    saveDb();
+    saveKid(name);
     login(name);
     location.href = "index.html";
   });
@@ -448,8 +522,7 @@ function renderLesson() {
       <a href="lessons.html">回到實驗課列表</a></div>`;
     return;
   }
-  const k = kid();
-  const checks = (k && k.checks[l.id]) || [];
+  const checks = (kid() && kid().checks[l.id]) || [];
   const done = isDone(l.id);
   const prev = LESSONS.find((x) => x.id === l.id - 1);
   const next = LESSONS.find((x) => x.id === l.id + 1);
@@ -530,8 +603,8 @@ function renderLesson() {
         b.checked = true;
         return;
       }
-      k.checks[l.id] = boxes.map((x) => x.checked);
-      saveDb();
+      kid().checks[l.id] = boxes.map((x) => x.checked);
+      saveKid(currentUser);
       refresh();
     })
   );
@@ -541,9 +614,11 @@ function renderLesson() {
     const ok = await askParent(`${currentUser} 完成了「第 ${l.id} 課・${l.title}」，請大人看過作品後輸入密碼。`);
     if (!ok) return;
     const before = STAGES.filter(stageUnlocked).map((s) => s.id);
-    k.done.push(l.id);
-    delete k.checks[l.id];
-    saveDb();
+    // 雲端資料可能在等待時更新過，所以重新取一次
+    const me = kid();
+    if (!me.done.includes(l.id)) me.done.push(l.id);
+    delete me.checks[l.id];
+    saveKid(currentUser);
     updateScorePill();
     refresh();
     const newly = STAGES.filter((s) => stageUnlocked(s) && !before.includes(s.id));
@@ -587,6 +662,16 @@ function renderParents() {
         : ""
     }
 
+    <h2>資料同步</h2>
+    <div class="card">
+      ${
+        familyDoc
+          ? `<p>☁️ <b>已連上雲端：</b>${esc(firebase.auth().currentUser.email || "家庭帳號")}。同一個家庭帳號登入的每台裝置，小孩帳號和分數都會同步。</p>
+             ${isAdmin() ? `<button class="btn danger" id="family-logout" type="button">這台裝置登出家庭帳號</button>` : ""}`
+          : `<p>📱 <b>只存在這台裝置：</b>還沒設定雲端同步，帳號和分數只存在這台裝置的瀏覽器裡。</p>`
+      }
+    </div>
+
     <h2>帳號和計分規則</h2>
     <div class="card">
       <ul>
@@ -599,7 +684,6 @@ function renderParents() {
         <li>全部完成共 ${maxScore()} 分。</li>
         <li>大人在登入頁選「大人管理模式」，可以瀏覽全部課程（不計分），也能重設或刪除小孩帳號。</li>
       </ul>
-      <p>帳號和進度只存在<b>這台裝置的這個瀏覽器</b>裡。換裝置、用無痕模式或清除瀏覽資料，就要重新建立。</p>
     </div>
 
     <h2>陪孩子做實驗的小提醒</h2>
@@ -640,13 +724,18 @@ function renderParents() {
         : ""
     }`;
 
+  const fl = document.getElementById("family-logout");
+  if (fl)
+    fl.addEventListener("click", async () => {
+      if (await askParent("這台裝置登出後，要再輸入家庭帳號才能使用。確定嗎？")) familyLogout();
+    });
   document.querySelectorAll("[data-reset]").forEach((b) =>
     b.addEventListener("click", async () => {
       const n = b.dataset.reset;
       if (!(await askParent(`確定要把 ${n} 的分數和完成紀錄清空嗎？這個動作不能復原。`))) return;
       db.kids[n].done = [];
       db.kids[n].checks = {};
-      saveDb();
+      saveKid(n);
       renderParents();
       toast("🧹", "進度已清除", `${n} 可以從第一階段重新開始。`);
     })
@@ -655,8 +744,7 @@ function renderParents() {
     b.addEventListener("click", async () => {
       const n = b.dataset.del;
       if (!(await askParent(`確定要刪除 ${n} 的帳號嗎？分數也會一起刪掉，不能復原。`))) return;
-      delete db.kids[n];
-      saveDb();
+      removeKid(n);
       renderParents();
       toast("🗑️", "帳號已刪除", `${n} 的帳號已經刪除。`);
     })
@@ -665,8 +753,48 @@ function renderParents() {
 
 const PAGES = { home: renderHome, shop: renderShop, lessons: renderLessons, lesson: renderLesson, parents: renderParents };
 
-document.addEventListener("DOMContentLoaded", () => {
+// ===== 家庭帳號登入（每台裝置只要登入一次） =====
+function renderFamilyLogin() {
+  document.getElementById("top").innerHTML = `<div class="wrap"><span class="logo">🧱 樂高實驗室</span></div>`;
+  document.getElementById("app").innerHTML = `
+    <section class="hero">
+      <span class="big">☁️🧱</span>
+      <h1>連上家庭帳號</h1>
+      <p class="lead">這台裝置第一次使用，請<b>大人</b>登入家庭帳號。<br>登入一次就會記住，之後小孩的分數會在每台平板同步。</p>
+    </section>
+    <form class="card login-form" id="family-login">
+      <label>家庭帳號 Email<input id="fm-email" type="email" required autocomplete="username"></label>
+      <label>家庭帳號密碼<input id="fm-pw" type="password" required autocomplete="current-password"></label>
+      <p class="err" id="fm-err" aria-live="polite"></p>
+      <button class="btn primary" type="submit">登入</button>
+    </form>`;
+  document.getElementById("family-login").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const err = document.getElementById("fm-err");
+    err.textContent = "登入中…";
+    try {
+      await firebase.auth().signInWithEmailAndPassword(document.getElementById("fm-email").value.trim(), document.getElementById("fm-pw").value);
+      location.href = "login.html";
+    } catch (ex) {
+      err.textContent = "登入失敗，請確認 Email 和密碼。（" + (ex.code || ex.message) + "）";
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
   const page = document.body.dataset.page;
+  let ready;
+  try {
+    ready = await initStore();
+  } catch (e) {
+    document.getElementById("app").innerHTML = `<div class="lock-box"><span class="emoji">📡</span>連不上雲端，請檢查網路後重新整理。<br><small>${esc(e.message || e)}</small></div>`;
+    return;
+  }
+  if (!ready) {
+    renderFamilyLogin();
+    return;
+  }
+  if (currentUser !== ADMIN && !db.kids[currentUser]) currentUser = null;
   if (page === "login") {
     if (currentUser) location.replace("index.html");
     else renderLogin();
